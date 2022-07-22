@@ -84,6 +84,18 @@ func (h helper) GenerateAccessToken(u user.User) ([]byte, error) {
 }
 
 func (h helper) UpdateRefreshToken(rt RT) ([]byte, error) {
-	return nil, nil
+	defer h.RTCache.Del([]byte(rt.RefreshToken))
 
+	userBytes, err := h.RTCache.Get([]byte(rt.RefreshToken))
+	if err != nil {
+		return nil, err
+	}
+
+	var u user.User
+	err = json.Unmarshal(userBytes, &u)
+	if err != nil {
+		return nil, err
+	}
+
+	return h.GenerateAccessToken(u)
 }
