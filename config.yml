@@ -1,5 +1,7 @@
 ---
 
+jwt:
+  secret: qwe123
 listen:
   bind_ip: 127.0.0.1
   port: 3001
