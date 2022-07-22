@@ -1,0 +1,10 @@
+---
+
+listen:
+  bind_ip: 127.0.0.1
+  port: 3001
+storage:
+  host: 127.0.0.1
+  port: 5432
+  database: ctr
+  username: postgres
