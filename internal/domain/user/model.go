@@ -20,13 +20,13 @@ func (u User) CheckPassword(password string) error {
 	return nil
 }
 
-type createUserDTO struct {
+type CreateUserDTO struct {
 	Name           string `json:"name"`
 	Password       string `json:"password"`
-	RepeatPassword string `json:"repeatPassword"`
+	RepeatPassword string `json:"repeat_password"`
 }
 
-type updateUserDTO struct {
+type UpdateUserDTO struct {
 	Id          int    `json:"id"`
 	Password    string `json:"password"`
 	OldPassword string `json:"old_password"`
