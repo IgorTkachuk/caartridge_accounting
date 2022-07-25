@@ -3,6 +3,7 @@ package jwt
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"github.com/IgorTkachuk/cartridge_accounting/internal/config"
 	"github.com/IgorTkachuk/cartridge_accounting/pkg/logging"
 	"github.com/cristalhq/jwt/v3"
@@ -15,9 +16,9 @@ func Middleware(h http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		logger := logging.GetLogger()
 
-		authHeader := strings.Split(r.Header.Get("Authorization"), "Bearer")
+		authHeader := strings.Split(r.Header.Get("Authorization"), "Bearer ")
 		if len(authHeader) != 2 {
-			logger.Error("Malformed token")
+			unauthorized(w, fmt.Errorf("malformed token"))
 			return
 		}
 

@@ -7,7 +7,11 @@ import (
 	"github.com/IgorTkachuk/cartridge_accounting/internal/config"
 	user2 "github.com/IgorTkachuk/cartridge_accounting/internal/domain/user"
 	user "github.com/IgorTkachuk/cartridge_accounting/internal/domain/user/db"
+	"github.com/IgorTkachuk/cartridge_accounting/internal/handlers/auth"
+	user3 "github.com/IgorTkachuk/cartridge_accounting/internal/handlers/user"
+	"github.com/IgorTkachuk/cartridge_accounting/pkg/cache/freecache"
 	"github.com/IgorTkachuk/cartridge_accounting/pkg/client/postgresql"
+	"github.com/IgorTkachuk/cartridge_accounting/pkg/jwt"
 	"github.com/IgorTkachuk/cartridge_accounting/pkg/logging"
 	"github.com/IgorTkachuk/cartridge_accounting/pkg/shutdown"
 	"github.com/julienschmidt/httprouter"
@@ -23,17 +27,30 @@ func main() {
 	cfg := config.GetConfig()
 	//cfg := postgresql.NewPgConfig("postgres", "mg0208", "localhost", "5432", "ctr")
 	cli, _ := postgresql.NewClient(context.Background(), 3, 5*time.Second, cfg.Storage)
-	r := user.NewRepository(cli)
-	svc := user2.NewService(r)
+	r := user.NewRepository(cli, logger)
+	svc := user2.NewService(r, logger)
 
-	userHandler := user2.Handler{
+	userHandler := user3.Handler{
 		UserService: svc,
+	}
+
+	RTCache := freecache.NewCacheRepo(10)
+	jwtHelper := jwt.NewHelper(RTCache, *logger)
+
+	authHandler := auth.Handler{
+		Logger:      *logger,
+		UserService: svc,
+		JWTHelper:   jwtHelper,
 	}
 
 	logger.Info("create router")
 	router := httprouter.New()
+
 	logger.Info("register user handler")
 	userHandler.Register(router)
+
+	logger.Info("register auth handler")
+	authHandler.Register(router)
 
 	start(router)
 

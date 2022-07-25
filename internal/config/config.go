@@ -8,7 +8,7 @@ import (
 
 type Config struct {
 	JWT struct {
-		Secret string `yaml:"Secret" env:"JWTSECRET" env-required:"true"`
+		Secret string `yaml:"secret" env:"JWTSECRET" env-required:"true"`
 	} `yaml:"jwt"`
 	Listen struct {
 		BindIP string `yaml:"bind_ip" env:"BIND" env-default :"127.0.0.1" env-required:"true"`

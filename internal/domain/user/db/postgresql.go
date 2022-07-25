@@ -11,6 +11,8 @@ import (
 	"strings"
 )
 
+var _ user.Repository = &repository{}
+
 type repository struct {
 	client postgresql.Client
 	logger *logging.Logger
@@ -25,6 +27,46 @@ func NewRepository(client postgresql.Client, logger *logging.Logger) user.Reposi
 
 func formatQuery(q string) string {
 	return strings.ReplaceAll(strings.ReplaceAll(q, "\t", ""), "\n", "")
+}
+
+func (r repository) FindById(ctx context.Context, id int) (user.User, error) {
+	q := `
+		SELECT
+			id, name, pwf_hash
+		FROM
+			usr
+		WHERE
+			id=$1
+	`
+	r.logger.Trace(fmt.Sprintf("SQL query: %s", formatQuery(q)))
+	var u user.User
+
+	err := r.client.QueryRow(ctx, q, id).Scan(&u.ID, &u.Name, &u.PwdHash)
+	if err != nil {
+		return user.User{}, err
+	}
+
+	return u, nil
+}
+
+func (r repository) FindByName(ctx context.Context, name string) (user.User, error) {
+	q := `
+		SELECT
+			id, name, pwd_hash
+		FROM
+			usr
+		WHERE
+			name=$1
+	`
+	r.logger.Trace(fmt.Sprintf("SQL query: %s", formatQuery(q)))
+	var u user.User
+
+	err := r.client.QueryRow(ctx, q, name).Scan(&u.ID, &u.Name, &u.PwdHash)
+	if err != nil {
+		return user.User{}, err
+	}
+
+	return u, nil
 }
 
 func (r repository) FindAll(ctx context.Context) (u []user.User, err error) {
@@ -51,7 +93,7 @@ func (r repository) FindAll(ctx context.Context) (u []user.User, err error) {
 	return users, nil
 }
 
-func (r repository) Create(ctx context.Context, u user.User) error {
+func (r repository) Create(ctx context.Context, u user.User) (int, error) {
 	q := `
 		INSERT INTO usr
 			(name, pwd_hash) 
@@ -66,10 +108,10 @@ func (r repository) Create(ctx context.Context, u user.User) error {
 			pgErr = err.(*pgconn.PgError)
 			newErr := fmt.Errorf(fmt.Sprintf("SQ: Error: %s, Detail: %s, Where: %s, Cde: %s, SQLState: %s", pgErr.Message, pgErr.Detail, pgErr.Where, pgErr.Code, pgErr.SQLState()))
 			r.logger.Error(newErr)
-			return newErr
+			return -1, newErr
 		}
-		return err
+		return -1, err
 	}
 
-	return nil
+	return u.ID, nil
 }
