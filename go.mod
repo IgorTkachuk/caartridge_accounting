@@ -27,6 +27,7 @@ require (
 	github.com/joho/godotenv v1.4.0 // indirect
 	github.com/kisielk/godepgraph v0.0.0-20220719222756-573dc89cecc8 // indirect
 	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
+	github.com/rs/cors v1.8.2 // indirect
 	github.com/samlitowitz/goimportcycle v1.0.4 // indirect
 	golang.org/x/mod v0.5.1 // indirect
 	golang.org/x/sys v0.0.0-20210615035016-665e8c7367d1 // indirect

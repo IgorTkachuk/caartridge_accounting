@@ -11,6 +11,7 @@ import (
 	user3 "github.com/IgorTkachuk/cartridge_accounting/internal/handlers/user"
 	"github.com/IgorTkachuk/cartridge_accounting/pkg/cache/freecache"
 	"github.com/IgorTkachuk/cartridge_accounting/pkg/client/postgresql"
+	http2 "github.com/IgorTkachuk/cartridge_accounting/pkg/http"
 	"github.com/IgorTkachuk/cartridge_accounting/pkg/jwt"
 	"github.com/IgorTkachuk/cartridge_accounting/pkg/logging"
 	"github.com/IgorTkachuk/cartridge_accounting/pkg/shutdown"
@@ -43,14 +44,19 @@ func main() {
 		JWTHelper:   jwtHelper,
 	}
 
-	logger.Info("create router")
-	router := httprouter.New()
+	logger.Info("create approuter")
+	approuter := httprouter.New()
 
 	logger.Info("register user handler")
-	userHandler.Register(router)
+	userHandler.Register(approuter)
 
 	logger.Info("register auth handler")
-	authHandler.Register(router)
+	authHandler.Register(approuter)
+
+	logger.Info("apply CORS settings")
+	corsSettings := http2.CorsSettings()
+
+	router := corsSettings.Handler(approuter)
 
 	start(router)
 
