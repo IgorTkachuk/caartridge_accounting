@@ -7,8 +7,8 @@ import (
 	"github.com/IgorTkachuk/cartridge_accounting/internal/domain/user"
 	"github.com/IgorTkachuk/cartridge_accounting/pkg/client/postgresql"
 	"github.com/IgorTkachuk/cartridge_accounting/pkg/logging"
+	"github.com/IgorTkachuk/cartridge_accounting/pkg/utils"
 	"github.com/jackc/pgconn"
-	"strings"
 )
 
 var _ user.Repository = &repository{}
@@ -25,10 +25,6 @@ func NewRepository(client postgresql.Client, logger *logging.Logger) user.Reposi
 	}
 }
 
-func formatQuery(q string) string {
-	return strings.ReplaceAll(strings.ReplaceAll(q, "\t", ""), "\n", "")
-}
-
 func (r repository) FindById(ctx context.Context, id int) (user.User, error) {
 	q := `
 		SELECT
@@ -38,7 +34,7 @@ func (r repository) FindById(ctx context.Context, id int) (user.User, error) {
 		WHERE
 			id=$1
 	`
-	r.logger.Trace(fmt.Sprintf("SQL query: %s", formatQuery(q)))
+	r.logger.Trace(fmt.Sprintf("SQL query: %s", utils.FormatQuery(q)))
 	var u user.User
 
 	err := r.client.QueryRow(ctx, q, id).Scan(&u.ID, &u.Name, &u.PwdHash)
@@ -58,7 +54,7 @@ func (r repository) FindByName(ctx context.Context, name string) (user.User, err
 		WHERE
 			name=$1
 	`
-	r.logger.Trace(fmt.Sprintf("SQL query: %s", formatQuery(q)))
+	r.logger.Trace(fmt.Sprintf("SQL query: %s", utils.FormatQuery(q)))
 	var u user.User
 
 	err := r.client.QueryRow(ctx, q, name).Scan(&u.ID, &u.Name, &u.PwdHash)
@@ -101,12 +97,12 @@ func (r repository) Create(ctx context.Context, u user.User) (int, error) {
 			($1, $2)
 		RETURNING id
 	`
-	r.logger.Trace(fmt.Sprintf("SQL Qery: %s", formatQuery(q)))
+	r.logger.Trace(fmt.Sprintf("SQL Qery: %s", utils.FormatQuery(q)))
 	if err := r.client.QueryRow(ctx, q, u.Name, u.PwdHash).Scan(&u.ID); err != nil {
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) {
 			pgErr = err.(*pgconn.PgError)
-			newErr := fmt.Errorf(fmt.Sprintf("SQ: Error: %s, Detail: %s, Where: %s, Cde: %s, SQLState: %s", pgErr.Message, pgErr.Detail, pgErr.Where, pgErr.Code, pgErr.SQLState()))
+			newErr := fmt.Errorf(fmt.Sprintf("SQL Error: %s, Detail: %s, Where: %s, Code: %s, SQLState: %s", pgErr.Message, pgErr.Detail, pgErr.Where, pgErr.Code, pgErr.SQLState()))
 			r.logger.Error(newErr)
 			return -1, newErr
 		}
