@@ -18,6 +18,38 @@ type repository struct {
 	logger *logging.Logger
 }
 
+func (r repository) Update(ctx context.Context, v vndr.UpdateVendorDTO) error {
+	q := `
+		UPDATE vendor
+		SET name=$1, logo_url=$2
+		WHERE id=$3
+	`
+
+	ct, err := r.client.Exec(ctx, q, v.Name, v.LogoUrl, v.ID)
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("Vendor update delete operation affected rows: %d", ct.RowsAffected())
+	return nil
+}
+
+func (r repository) Delete(ctx context.Context, id int) (int, error) {
+	q := `
+		DELETE
+		FROM vendor
+		WHERE id=$1
+	`
+
+	ct, err := r.client.Exec(ctx, q, id)
+	if err != nil {
+		return 0, err
+	}
+	fmt.Printf("CommandTag (RowAffected) ####: %d", ct.RowsAffected())
+
+	return int(ct.RowsAffected()), nil
+}
+
 func (r repository) FindAll(ctx context.Context) (v []vndr.Vendor, err error) {
 	q := `
 		SELECT

@@ -12,11 +12,17 @@ type Service interface {
 	Create(ctx context.Context, v CreateVendorDTO) (int, error)
 	GetById(ctx context.Context, id int) (v Vendor, err error)
 	GetByName(ctx context.Context, name string) ([]Vendor, error)
+	Delete(ctx context.Context, id int) (int, error)
+	Update(ctx context.Context, v UpdateVendorDTO) error
 }
 
 type service struct {
 	repository Repository
 	logger     *logging.Logger
+}
+
+func (s service) Update(ctx context.Context, v UpdateVendorDTO) error {
+	return s.repository.Update(ctx, v)
 }
 
 func NewService(repository Repository, logger *logging.Logger) Service {
@@ -32,7 +38,6 @@ func (s service) GetAll(ctx context.Context) (v []Vendor, err error) {
 
 	return
 }
-
 func (s service) Create(ctx context.Context, v CreateVendorDTO) (id int, err error) {
 	vndr := NewVendor(v)
 	id, err = s.repository.Create(ctx, vndr)
@@ -46,4 +51,8 @@ func (s service) GetById(ctx context.Context, id int) (v Vendor, err error) {
 
 func (s service) GetByName(ctx context.Context, name string) ([]Vendor, error) {
 	return s.repository.FindByName(ctx, name)
+}
+
+func (s service) Delete(ctx context.Context, id int) (int, error) {
+	return s.repository.Delete(ctx, id)
 }

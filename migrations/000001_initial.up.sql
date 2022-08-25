@@ -4,6 +4,17 @@ CREATE TABLE vendor (
                         logo_url TEXT
 );
 
+INSERT INTO vendor (
+                   name, logo_url
+)
+    VALUES
+        ('Epson','https://logos-world.net/wp-content/uploads/2020/12/Epson-Logo.png'),
+        ('Canon','https://logos-world.net/wp-content/uploads/2020/08/Canon-Logo-700x394.png'),
+        ('Samsung','https://logos-world.net/wp-content/uploads/2020/04/Samsung-Logo-700x394.png'),
+        ('Hewlett Packard','https://logos-world.net/wp-content/uploads/2020/11/HP-Logo-700x394.png'),
+        ('Konica Minolta','https://www.konicaminolta.ua/App_Themes/Emakina/images/logo.svg');
+
+
 CREATE TABLE prn_model (
                            id serial PRIMARY KEY,
                            name TEXT,

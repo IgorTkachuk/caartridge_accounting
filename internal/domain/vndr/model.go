@@ -12,8 +12,13 @@ type CreateVendorDTO struct {
 }
 
 type UpdateVendorDTO struct {
+	ID      int    `json:"id,omitempty"`
 	Name    string `json:"name,omitempty"`
 	LogoUrl string `json:"logo_url,omitempty"`
+}
+
+type DeleteVendorDTO struct {
+	ID int `json:"id"`
 }
 
 func NewVendor(dto CreateVendorDTO) Vendor {

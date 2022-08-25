@@ -72,6 +72,10 @@ func (h *Handler) Auth(w http.ResponseWriter, r *http.Request) error {
 			return err
 		}
 
+		if err = u.CheckPassword(dto.Password); err != nil {
+			return err
+		}
+
 		token, err = h.JWTHelper.GenerateAccessToken(u)
 		if err != nil {
 			return err
@@ -90,7 +94,7 @@ func (h *Handler) Auth(w http.ResponseWriter, r *http.Request) error {
 		}
 	}
 
-	w.WriteHeader(http.StatusCreated)
+	w.WriteHeader(http.StatusOK)
 	w.Write(token)
 
 	return err
