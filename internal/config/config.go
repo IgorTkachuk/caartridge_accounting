@@ -7,19 +7,22 @@ import (
 )
 
 type Config struct {
+	JWT struct {
+		Secret string `yaml:"secret" env:"JWTSECRET" env-required:"true"`
+	} `yaml:"jwt"`
 	Listen struct {
-		BindIP string `yaml:"bind_ip" env:"BIND" env-default :"127.0.0.1"`
-		Port   string `yaml:"port" env:"PORT" env-default:"3001"`
+		BindIP string `yaml:"bind_ip" env:"BIND" env-default :"127.0.0.1" env-required:"true"`
+		Port   string `yaml:"port" env:"PORT" env-default:"3001" env-required:"true"`
 	} `yaml:"listen"`
 	Storage StorageConfig `yaml:"storage"`
 }
 
 type StorageConfig struct {
-	Host     string `yaml:"host" env:"DBHOST" env-default:"127.0.0.1"`
-	Port     string `yaml:"port" env:"DBPORT" env-default:"5432"`
-	Database string `yaml:"database" env:"DBNAME" env-default:"ctr"`
-	Username string `yaml:"username" env:"DBUSER" env-default:"postgres"`
-	Password string `yaml:"password" env:"DBPASS" env-default:""`
+	Host     string `yaml:"host" env:"DBHOST" env-default:"127.0.0.1" env-required:"true"`
+	Port     string `yaml:"port" env:"DBPORT" env-default:"5432" env-required:"true"`
+	Database string `yaml:"database" env:"DBNAME" env-default:"ctr env-required:"true""`
+	Username string `yaml:"username" env:"DBUSER" env-default:"postgres" env-required:"true"`
+	Password string `yaml:"password" env:"DBPASS" env-default:"" env-required:"true"`
 }
 
 var instance *Config
