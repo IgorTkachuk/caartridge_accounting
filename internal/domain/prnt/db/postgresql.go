@@ -144,6 +144,6 @@ func (r repository) Update(ctx context.Context, prn prnt.UpdatePrnDTO) error {
 		return err
 	}
 
-	fmt.Printf("Vendor update delete operation affected rows: %d", ct.RowsAffected())
+	fmt.Printf("Vendor update operation affected rows: %d", ct.RowsAffected())
 	return nil
 }
