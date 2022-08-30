@@ -80,7 +80,7 @@ func (r repository) FindById(ctx context.Context, id int) (prn prnt.Prn, err err
 			id=$1
 	`
 
-	if err = r.client.QueryRow(ctx, q, id).Scan(&prn); err != nil {
+	if err := r.client.QueryRow(ctx, q, id).Scan(&prn.ID, &prn.Name, &prn.VendorID, &prn.ImageUrl); err != nil {
 		return prnt.Prn{}, err
 	}
 

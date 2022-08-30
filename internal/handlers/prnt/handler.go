@@ -27,6 +27,7 @@ type Handler struct {
 func (h Handler) Register(router *httprouter.Router) {
 	router.HandlerFunc(http.MethodGet, printersURL, jwt.Middleware(apperror.Middleware(h.GetPrinters)))
 	router.HandlerFunc(http.MethodPost, printersURL, jwt.Middleware(apperror.Middleware(h.CreatePrinter)))
+	router.HandlerFunc(http.MethodGet, printerURL, jwt.Middleware(apperror.Middleware(h.GetPrinterById)))
 	router.HandlerFunc(http.MethodDelete, printerURL, jwt.Middleware(apperror.Middleware(h.DeletePrinter)))
 	router.HandlerFunc(http.MethodPatch, printersURL, jwt.Middleware(apperror.Middleware(h.UpdatePrinter)))
 }
@@ -101,5 +102,26 @@ func (h Handler) UpdatePrinter(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	w.WriteHeader(http.StatusNoContent)
+	return nil
+}
+
+func (h Handler) GetPrinterById(w http.ResponseWriter, r *http.Request) error {
+	params := r.Context().Value(httprouter.ParamsKey).(httprouter.Params)
+	printerId, _ := strconv.Atoi(params.ByName("id"))
+
+	printerInfo, err := h.PrinterService.GetById(r.Context(), printerId)
+	if err != nil {
+		return err
+	}
+
+	printerInfoBytes, err := json.Marshal(printerInfo)
+	if err != nil {
+		return err
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write(printerInfoBytes)
+
 	return nil
 }
