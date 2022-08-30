@@ -5,11 +5,14 @@ import (
 	"errors"
 	"fmt"
 	"github.com/IgorTkachuk/cartridge_accounting/internal/config"
+	prnt2 "github.com/IgorTkachuk/cartridge_accounting/internal/domain/prnt"
+	prnt "github.com/IgorTkachuk/cartridge_accounting/internal/domain/prnt/db"
 	user2 "github.com/IgorTkachuk/cartridge_accounting/internal/domain/user"
 	user "github.com/IgorTkachuk/cartridge_accounting/internal/domain/user/db"
 	vndr2 "github.com/IgorTkachuk/cartridge_accounting/internal/domain/vndr"
 	vndr "github.com/IgorTkachuk/cartridge_accounting/internal/domain/vndr/db"
 	"github.com/IgorTkachuk/cartridge_accounting/internal/handlers/auth"
+	prnt3 "github.com/IgorTkachuk/cartridge_accounting/internal/handlers/prnt"
 	user3 "github.com/IgorTkachuk/cartridge_accounting/internal/handlers/user"
 	vndr3 "github.com/IgorTkachuk/cartridge_accounting/internal/handlers/vndr"
 	"github.com/IgorTkachuk/cartridge_accounting/pkg/cache/freecache"
@@ -53,6 +56,12 @@ func main() {
 		VendorService: vendorSvc,
 	}
 
+	printersRepo := prnt.NewRepository(cli, logger)
+	printersSvc := prnt2.NewService(printersRepo, logger)
+	printersHandler := prnt3.Handler{
+		PrinterService: printersSvc,
+	}
+
 	logger.Info("create approuter")
 	approuter := httprouter.New()
 
@@ -64,6 +73,9 @@ func main() {
 
 	logger.Info("register vendor handler")
 	vendorHandler.Register(approuter)
+
+	logger.Info("register printers handler")
+	printersHandler.Register(approuter)
 
 	logger.Info("apply CORS settings")
 	corsSettings := http2.CorsSettings()
