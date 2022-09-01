@@ -41,6 +41,27 @@ func (r repository) FindAll(ctx context.Context) ([]cartridge_model.CartridgeMod
 	for rows.Next() {
 		var ctr cartridge_model.CartridgeModel
 		rows.Scan(&ctr.ID, &ctr.Name, &ctr.VendorId, &ctr.ImageUrl)
+		qSuppPrns := `
+		SELECT
+			prn_model_id
+		FROM
+			ctr_supp_prn
+		WHERE
+			ctr_model_id=$1
+		`
+		rows, err := r.client.Query(ctx, qSuppPrns, ctr.ID)
+		if err != nil {
+			return nil, err
+		}
+
+		suppPrns := make([]int, 0)
+		for rows.Next() {
+			var suppPrnId int
+			rows.Scan(&suppPrnId)
+			suppPrns = append(suppPrns, suppPrnId)
+		}
+		ctr.SuppPrns = suppPrns
+
 		ctrModels = append(ctrModels, ctr)
 	}
 
@@ -61,6 +82,28 @@ func (r repository) FindById(ctx context.Context, id int) (c cartridge_model.Car
 	if err != nil {
 		return cartridge_model.CartridgeModel{}, err
 	}
+
+	qSuppPrns := `
+		SELECT 
+			prn_model_id
+		FROM
+			ctr_supp_prn
+		WHERE
+			ctr_model_id=$1
+	`
+
+	rows, err := r.client.Query(ctx, qSuppPrns, id)
+	if err != nil {
+		return cartridge_model.CartridgeModel{}, err
+	}
+
+	suppPrnModels := make([]int, 0)
+	for rows.Next() {
+		var suppPrnModel int
+		rows.Scan(&suppPrnModel)
+		suppPrnModels = append(suppPrnModels, suppPrnModel)
+	}
+	c.SuppPrns = suppPrnModels
 
 	return
 }
@@ -94,14 +137,52 @@ func (r repository) Update(ctx context.Context, ctrModel cartridge_model.UpdateC
 			ctr_model
 		SET
 			name=$1, vendor_id=$2, image_url=$3
+		WHERE
+			id=$4
 	`
 
-	ct, err := r.client.Exec(ctx, q, &ctrModel.Name, &ctrModel.VendorId, &ctrModel.ImageUrl)
+	ct, err := r.client.Exec(ctx, q, &ctrModel.Name, &ctrModel.VendorId, &ctrModel.ImageUrl, &ctrModel.ID)
 	if err != nil {
 		return err
 	}
 
 	fmt.Printf("Carteidge model update operation affected rows: %d", ct.RowsAffected())
+
+	qSuppPrnsDel := `
+		DELETE
+		FROM 
+			ctr_supp_prn
+		WHERE
+			ctr_model_id=$1
+	`
+	ct, err = r.client.Exec(ctx, qSuppPrnsDel, &ctrModel.ID)
+	if err != nil {
+		return err
+	}
+
+	if len(ctrModel.SuppPrns) == 0 {
+		return nil
+	}
+
+	qSuppPrnsIns := `
+		INSERT INTO
+			ctr_supp_prn (ctr_model_id, prn_model_id)
+		VALUES
+
+	`
+	for i, prn := range ctrModel.SuppPrns {
+		row := fmt.Sprintf(" (%d,%d)", ctrModel.ID, prn)
+		qSuppPrnsIns += row
+		if i != len(ctrModel.SuppPrns)-1 {
+			qSuppPrnsIns += ", "
+		}
+	}
+
+	ct, err = r.client.Exec(ctx, qSuppPrnsIns)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 

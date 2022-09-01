@@ -5,6 +5,7 @@ type CartridgeModel struct {
 	Name     string `json:"name,omitempty"`
 	VendorId int    `json:"vendor_id,omitempty"`
 	ImageUrl string `json:"image_url,omitempty"`
+	SuppPrns []int  `json:"supp_prns"`
 }
 
 type CreateCartridgeModelDTO struct {
@@ -18,4 +19,5 @@ type UpdateCartridgeModelDTO struct {
 	Name     string `json:"name,omitempty"`
 	VendorId int    `json:"vendor_id,omitempty"`
 	ImageUrl string `json:"image_url,omitempty"`
+	SuppPrns []int  `json:"supp_prns"`
 }
