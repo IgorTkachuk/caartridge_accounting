@@ -5,6 +5,8 @@ import (
 	"errors"
 	"fmt"
 	"github.com/IgorTkachuk/cartridge_accounting/internal/config"
+	cartridge_model3 "github.com/IgorTkachuk/cartridge_accounting/internal/domain/cartridge_model"
+	cartridge_model "github.com/IgorTkachuk/cartridge_accounting/internal/domain/cartridge_model/db"
 	prnt2 "github.com/IgorTkachuk/cartridge_accounting/internal/domain/prnt"
 	prnt "github.com/IgorTkachuk/cartridge_accounting/internal/domain/prnt/db"
 	user2 "github.com/IgorTkachuk/cartridge_accounting/internal/domain/user"
@@ -12,6 +14,7 @@ import (
 	vndr2 "github.com/IgorTkachuk/cartridge_accounting/internal/domain/vndr"
 	vndr "github.com/IgorTkachuk/cartridge_accounting/internal/domain/vndr/db"
 	"github.com/IgorTkachuk/cartridge_accounting/internal/handlers/auth"
+	cartridge_model2 "github.com/IgorTkachuk/cartridge_accounting/internal/handlers/cartridge_model"
 	prnt3 "github.com/IgorTkachuk/cartridge_accounting/internal/handlers/prnt"
 	user3 "github.com/IgorTkachuk/cartridge_accounting/internal/handlers/user"
 	vndr3 "github.com/IgorTkachuk/cartridge_accounting/internal/handlers/vndr"
@@ -62,6 +65,12 @@ func main() {
 		PrinterService: printersSvc,
 	}
 
+	ctrModelsRepo := cartridge_model.NewRepository(cli, logger)
+	ctrModelsSvc := cartridge_model3.NewService(ctrModelsRepo, logger)
+	ctrModelsHandler := cartridge_model2.Handler{
+		CartridgeModelSvc: ctrModelsSvc,
+	}
+
 	logger.Info("create approuter")
 	approuter := httprouter.New()
 
@@ -76,6 +85,9 @@ func main() {
 
 	logger.Info("register printers handler")
 	printersHandler.Register(approuter)
+
+	logger.Info("register cartridge models handler")
+	ctrModelsHandler.Register(approuter)
 
 	logger.Info("apply CORS settings")
 	corsSettings := http2.CorsSettings()
