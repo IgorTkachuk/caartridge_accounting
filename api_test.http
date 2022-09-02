@@ -1,4 +1,32 @@
+### AUTH
+POST http://localhost:{{servicePort}}/api/auth
+Content-Type: application/json
+
+{
+  "name": "{{userName}}",
+  "password": "{{userPassword}}"
+}
+
+> {%
+client.global.set("auth_token", response.body.token);
+%}
+
+### GET Users
 GET http://localhost:3001/api/users
+Authorization: Bearer {{auth_token}}
 Accept: application/json
 
-###
+### GET organizational unit
+GET  http://localhost:3001/api/ous
+Authorization: Bearer {{auth_token}}
+Accept: application/json
+
+### Create new Ou
+POST http://localhost:3001/api/ous
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "name": "HelpDesk Department",
+  "parent_id": 7
+}

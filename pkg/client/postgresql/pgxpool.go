@@ -40,7 +40,7 @@ type Client interface {
 
 func NewClient(ctx context.Context, maxAttempts int, maxDelay time.Duration, sc config.StorageConfig) (pool *pgxpool.Pool, err error) {
 	dsn := fmt.Sprintf(
-		"postgresql://%s:%s@%s:%s/%s",
+		"postgres://%s:%s@%s:%s/%s",
 		sc.Username, sc.Password,
 		sc.Host, sc.Port, sc.Database,
 	)
