@@ -56,7 +56,7 @@ func (h *Handler) CreateVendor(w http.ResponseWriter, r *http.Request) error {
 	logger := logging.GetLogger()
 	logger.Info("Creating new vendor")
 
-	w.Header().Set("Content-Type", "applicatio/json")
+	w.Header().Set("Content-Type", "application/json")
 
 	defer r.Body.Close()
 	var dto vndr.CreateVendorDTO
@@ -131,4 +131,3 @@ func (h Handler) GetVendorById(w http.ResponseWriter, r *http.Request) error {
 
 	return nil
 }
-

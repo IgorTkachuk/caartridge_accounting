@@ -7,6 +7,8 @@ import (
 	"github.com/IgorTkachuk/cartridge_accounting/internal/config"
 	cartridge_model3 "github.com/IgorTkachuk/cartridge_accounting/internal/domain/cartridge_model"
 	cartridge_model "github.com/IgorTkachuk/cartridge_accounting/internal/domain/cartridge_model/db"
+	"github.com/IgorTkachuk/cartridge_accounting/internal/domain/ou"
+	ou2 "github.com/IgorTkachuk/cartridge_accounting/internal/domain/ou/db"
 	prnt2 "github.com/IgorTkachuk/cartridge_accounting/internal/domain/prnt"
 	prnt "github.com/IgorTkachuk/cartridge_accounting/internal/domain/prnt/db"
 	user2 "github.com/IgorTkachuk/cartridge_accounting/internal/domain/user"
@@ -15,6 +17,7 @@ import (
 	vndr "github.com/IgorTkachuk/cartridge_accounting/internal/domain/vndr/db"
 	"github.com/IgorTkachuk/cartridge_accounting/internal/handlers/auth"
 	cartridge_model2 "github.com/IgorTkachuk/cartridge_accounting/internal/handlers/cartridge_model"
+	ou3 "github.com/IgorTkachuk/cartridge_accounting/internal/handlers/ou"
 	prnt3 "github.com/IgorTkachuk/cartridge_accounting/internal/handlers/prnt"
 	user3 "github.com/IgorTkachuk/cartridge_accounting/internal/handlers/user"
 	vndr3 "github.com/IgorTkachuk/cartridge_accounting/internal/handlers/vndr"
@@ -35,7 +38,7 @@ import (
 func main() {
 	logger := logging.GetLogger()
 	cfg := config.GetConfig()
-	//cfg := postgresql.NewPgConfig("postgres", "mg0208", "localhost", "5432", "ctr")
+	//cfg := db.NewPgConfig("postgres", "mg0208", "localhost", "5432", "ctr")
 	cli, _ := postgresql.NewClient(context.Background(), 3, 5*time.Second, cfg.Storage)
 	r := user.NewRepository(cli, logger)
 	svc := user2.NewService(r, logger)
@@ -71,6 +74,12 @@ func main() {
 		CartridgeModelSvc: ctrModelsSvc,
 	}
 
+	ouRepo := ou2.NewRepository(cli, logger)
+	ouSvc := ou.NewService(ouRepo, logger)
+	ouHandler := ou3.Handler{
+		OuService: ouSvc,
+	}
+
 	logger.Info("create approuter")
 	approuter := httprouter.New()
 
@@ -88,6 +97,8 @@ func main() {
 
 	logger.Info("register cartridge models handler")
 	ctrModelsHandler.Register(approuter)
+
+	ouHandler.Register(approuter)
 
 	logger.Info("apply CORS settings")
 	corsSettings := http2.CorsSettings()
