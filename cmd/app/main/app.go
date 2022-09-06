@@ -5,6 +5,8 @@ import (
 	"errors"
 	"fmt"
 	"github.com/IgorTkachuk/cartridge_accounting/internal/config"
+	business_line2 "github.com/IgorTkachuk/cartridge_accounting/internal/domain/business_line"
+	business_line "github.com/IgorTkachuk/cartridge_accounting/internal/domain/business_line/db"
 	cartridge_model3 "github.com/IgorTkachuk/cartridge_accounting/internal/domain/cartridge_model"
 	cartridge_model "github.com/IgorTkachuk/cartridge_accounting/internal/domain/cartridge_model/db"
 	"github.com/IgorTkachuk/cartridge_accounting/internal/domain/ou"
@@ -16,6 +18,7 @@ import (
 	vndr2 "github.com/IgorTkachuk/cartridge_accounting/internal/domain/vndr"
 	vndr "github.com/IgorTkachuk/cartridge_accounting/internal/domain/vndr/db"
 	"github.com/IgorTkachuk/cartridge_accounting/internal/handlers/auth"
+	"github.com/IgorTkachuk/cartridge_accounting/internal/handlers/bisiness_line"
 	cartridge_model2 "github.com/IgorTkachuk/cartridge_accounting/internal/handlers/cartridge_model"
 	ou3 "github.com/IgorTkachuk/cartridge_accounting/internal/handlers/ou"
 	prnt3 "github.com/IgorTkachuk/cartridge_accounting/internal/handlers/prnt"
@@ -80,6 +83,12 @@ func main() {
 		OuService: ouSvc,
 	}
 
+	blRepo := business_line.NewRepository(cli, logger)
+	blSvc := business_line2.NewService(blRepo, logger)
+	blHandler := bisiness_line.Handler{
+		BusinessLineSvc: blSvc,
+	}
+
 	logger.Info("create approuter")
 	approuter := httprouter.New()
 
@@ -98,7 +107,11 @@ func main() {
 	logger.Info("register cartridge models handler")
 	ctrModelsHandler.Register(approuter)
 
+	logger.Info("register organizational unit handler")
 	ouHandler.Register(approuter)
+
+	logger.Info("Register business line handler")
+	blHandler.Register(approuter)
 
 	logger.Info("apply CORS settings")
 	corsSettings := http2.CorsSettings()
