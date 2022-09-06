@@ -30,3 +30,32 @@ Content-Type: application/json
   "name": "HelpDesk Department",
   "parent_id": 7
 }
+
+### Create business line entity
+POST http://localhost:{{servicePort}}/api/bl
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "name": "Other activities"
+}
+
+### Get all buseness lines
+GET http://localhost:{{servicePort}}/api/bl
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+### Update some busines line
+PATCH http://localhost:{{servicePort}}/api/bl
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "id": 1,
+  "name": "Other activities 2"
+}
+
+### Delete some business line
+DELETE http://localhost:{{servicePort}}/api/bl/1
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
