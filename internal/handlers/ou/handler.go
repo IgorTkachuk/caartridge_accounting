@@ -71,7 +71,7 @@ func (h Handler) CreateOu(w http.ResponseWriter, r *http.Request) error {
 }
 
 func (h Handler) GetOuById(w http.ResponseWriter, r *http.Request) error {
-	params := r.Context().Value(httprouter.ParamsKey).(*httprouter.Params)
+	params := r.Context().Value(httprouter.ParamsKey).(httprouter.Params)
 	ouId, err := strconv.Atoi(params.ByName("id"))
 	if err != nil {
 		return err
@@ -95,7 +95,7 @@ func (h Handler) GetOuById(w http.ResponseWriter, r *http.Request) error {
 }
 
 func (h Handler) DeleteOu(w http.ResponseWriter, r *http.Request) error {
-	params := r.Context().Value(httprouter.ParamsKey).(*httprouter.Params)
+	params := r.Context().Value(httprouter.ParamsKey).(httprouter.Params)
 	ouId, err := strconv.Atoi(params.ByName("id"))
 	if err != nil {
 		return err
