@@ -59,3 +59,35 @@ Content-Type: application/json
 DELETE http://localhost:{{servicePort}}/api/bl/1
 Authorization: Bearer {{auth_token}}
 Content-Type: application/json
+
+
+### Create employee entity
+POST http://localhost:{{servicePort}}/api/employee
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "name": "Igor Tkachuk",
+  "ou_id": 9
+}
+
+### Get all employees
+GET http://localhost:{{servicePort}}/api/employee
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+### Update some employee
+PATCH http://localhost:{{servicePort}}/api/employee
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "id": 3,
+  "name": "Andjey Leka",
+  "ou_id": 9
+}
+
+### Delete some employee
+DELETE http://localhost:{{servicePort}}/api/employee/3
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json

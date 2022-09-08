@@ -9,6 +9,8 @@ import (
 	business_line "github.com/IgorTkachuk/cartridge_accounting/internal/domain/business_line/db"
 	cartridge_model3 "github.com/IgorTkachuk/cartridge_accounting/internal/domain/cartridge_model"
 	cartridge_model "github.com/IgorTkachuk/cartridge_accounting/internal/domain/cartridge_model/db"
+	employee2 "github.com/IgorTkachuk/cartridge_accounting/internal/domain/employee"
+	employee "github.com/IgorTkachuk/cartridge_accounting/internal/domain/employee/db"
 	"github.com/IgorTkachuk/cartridge_accounting/internal/domain/ou"
 	ou2 "github.com/IgorTkachuk/cartridge_accounting/internal/domain/ou/db"
 	prnt2 "github.com/IgorTkachuk/cartridge_accounting/internal/domain/prnt"
@@ -20,6 +22,7 @@ import (
 	"github.com/IgorTkachuk/cartridge_accounting/internal/handlers/auth"
 	"github.com/IgorTkachuk/cartridge_accounting/internal/handlers/bisiness_line"
 	cartridge_model2 "github.com/IgorTkachuk/cartridge_accounting/internal/handlers/cartridge_model"
+	employee3 "github.com/IgorTkachuk/cartridge_accounting/internal/handlers/employee"
 	ou3 "github.com/IgorTkachuk/cartridge_accounting/internal/handlers/ou"
 	prnt3 "github.com/IgorTkachuk/cartridge_accounting/internal/handlers/prnt"
 	user3 "github.com/IgorTkachuk/cartridge_accounting/internal/handlers/user"
@@ -89,6 +92,12 @@ func main() {
 		BusinessLineSvc: blSvc,
 	}
 
+	employeeRepo := employee.NewRepository(cli, logger)
+	employeeSvc := employee2.NewService(employeeRepo, logger)
+	employeeHandler := employee3.Handler{
+		EmployeeService: employeeSvc,
+	}
+
 	logger.Info("create approuter")
 	approuter := httprouter.New()
 
@@ -112,6 +121,9 @@ func main() {
 
 	logger.Info("Register business line handler")
 	blHandler.Register(approuter)
+
+	logger.Info("Register employee handler")
+	employeeHandler.Register(approuter)
 
 	logger.Info("apply CORS settings")
 	corsSettings := http2.CorsSettings()
