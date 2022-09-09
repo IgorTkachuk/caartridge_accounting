@@ -91,3 +91,33 @@ Content-Type: application/json
 DELETE http://localhost:{{servicePort}}/api/employee/3
 Authorization: Bearer {{auth_token}}
 Content-Type: application/json
+
+
+### Create doctype entity
+POST http://localhost:{{servicePort}}/api/doctype
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "name": "commissioning"
+}
+
+### Get all doctypes
+GET http://localhost:{{servicePort}}/api/doctype
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+### Update some doctype
+PATCH http://localhost:{{servicePort}}/api/doctype
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "id": 1,
+  "name": "commissioning"
+}
+
+### Delete some doctype
+DELETE http://localhost:{{servicePort}}/api/doctype/1
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
