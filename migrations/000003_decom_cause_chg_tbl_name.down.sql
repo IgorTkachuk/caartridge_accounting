@@ -1,0 +1,1 @@
+ALTER TABLE decommissioning_cause RENAME TO decomissioning_cause;
