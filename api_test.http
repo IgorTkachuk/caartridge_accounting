@@ -152,3 +152,34 @@ Content-Type: application/json
 DELETE http://localhost:{{servicePort}}/api/decomcause/1
 Authorization: Bearer {{auth_token}}
 Content-Type: application/json
+
+### ---
+
+### Create cartridge status type entity
+POST http://localhost:{{servicePort}}/api/ctrstatustype
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "name": "full, on warehouse"
+}
+
+### Get all cartridge status types
+GET http://localhost:{{servicePort}}/api/ctrstatustype
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+### Update some cartridge status type
+PATCH http://localhost:{{servicePort}}/api/ctrstatustype
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "id": 1,
+  "name": "on refueling"
+}
+
+### Delete some cartridge status type
+DELETE http://localhost:{{servicePort}}/api/ctrstatustype/2
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
