@@ -20,7 +20,7 @@ type repository struct {
 func (r repository) GetAll(ctx context.Context) ([]doc_type.DocType, error) {
 	q := `
 		SELECT
-			id, name, ctr_status_type_id
+			id, name, ctr_status_type_from, ctr_status_type_to
 		FROM
 			doc_type
 	`
@@ -33,7 +33,7 @@ func (r repository) GetAll(ctx context.Context) ([]doc_type.DocType, error) {
 	docTypes := make([]doc_type.DocType, 0)
 	for rows.Next() {
 		var docType doc_type.DocType
-		err := rows.Scan(&docType.ID, &docType.Name, &docType.CtrStatusTypeId)
+		err := rows.Scan(&docType.ID, &docType.Name, &docType.CtrStatusTypeFrom, &docType.CtrStatusTypeTo)
 		if err != nil {
 			return nil, err
 		}
@@ -46,13 +46,13 @@ func (r repository) GetAll(ctx context.Context) ([]doc_type.DocType, error) {
 func (r repository) GetById(ctx context.Context, id int) (docType doc_type.DocType, err error) {
 	q := `
 		SELECT
-			id, name, ctr_status_type_id
+			id, name, ctr_status_type_from, ctr_status_type_to
 		FROM
 			doc_type
 		WHERE
 			id=$1
 	`
-	err = r.client.QueryRow(ctx, q, id).Scan(&docType.ID, &docType.Name, &docType.CtrStatusTypeId)
+	err = r.client.QueryRow(ctx, q, id).Scan(&docType.ID, &docType.Name, &docType.CtrStatusTypeFrom, &docType.CtrStatusTypeTo)
 	if err != nil {
 		return doc_type.DocType{}, err
 	}
@@ -63,12 +63,12 @@ func (r repository) GetById(ctx context.Context, id int) (docType doc_type.DocTy
 func (r repository) Create(ctx context.Context, docType doc_type.CreateDocTypeDTO) (id int, err error) {
 	q := `
 		INSERT INTO doc_type
-			(name, ctr_status_type_id)
+			(name, ctr_status_type_from, ctr_status_type_to)
 		VALUES
-			($1, $2)
+			($1, $2, $3)
 		RETURNING id
 	`
-	if err = r.client.QueryRow(ctx, q, docType.Name, docType.CtrStatusTypeId).Scan(&id); err != nil {
+	if err = r.client.QueryRow(ctx, q, docType.Name, docType.CtrStatusTypeFrom, docType.CtrStatusTypeTo).Scan(&id); err != nil {
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) {
 			newErr := fmt.Errorf(fmt.Sprintf("%s", pgErr.Message))
@@ -85,11 +85,11 @@ func (r repository) Update(ctx context.Context, docType doc_type.UpdateDocTypeDT
 		UPDATE
 			doc_type
 		SET
-			name=$1, ctr_status_type_id=$2
+			name=$1, ctr_status_type_from=$2, ctr_status_type_to=$3
 		WHERE
 			id=$3
 	`
-	_, err := r.client.Exec(ctx, q, docType.Name, docType.CtrStatusTypeId, docType.ID)
+	_, err := r.client.Exec(ctx, q, docType.Name, docType.CtrStatusTypeFrom, docType.CtrStatusTypeTo, docType.ID)
 	if err != nil {
 		return err
 	}
