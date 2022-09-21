@@ -87,7 +87,7 @@ func (r repository) Update(ctx context.Context, docType doc_type.UpdateDocTypeDT
 		SET
 			name=$1, ctr_status_type_from=$2, ctr_status_type_to=$3
 		WHERE
-			id=$3
+			id=$4
 	`
 	_, err := r.client.Exec(ctx, q, docType.Name, docType.CtrStatusTypeFrom, docType.CtrStatusTypeTo, docType.ID)
 	if err != nil {
