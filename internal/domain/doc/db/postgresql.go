@@ -78,15 +78,15 @@ func (r repository) Create(ctx context.Context, dto doc.CreateDocDTO) (id int, e
 		INSERT INTO doc (
 			doc_type_id, doc_date, employee_id, doc_owner_id, 
 			decommissioning_cause_id, ou_id, sd_claim_number,
-			regenerate_type_id, created_at, updated_at
+			regenerate_type_id
 		)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
 		RETURNING id
 	`
 	err = r.client.QueryRow(ctx, q,
 		dto.DocTypeId, dto.DocDate, dto.EmployeeId, dto.DocOwnerId,
 		dto.DecommissioningCauseId, dto.OuId, dto.SdClaimNumber,
-		dto.RegenerateTypeId, dto.CreatedAt, dto.UpdatedAt,
+		dto.RegenerateTypeId,
 	).Scan(&id)
 
 	if err != nil {
