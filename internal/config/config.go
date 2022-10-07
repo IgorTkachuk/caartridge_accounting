@@ -20,7 +20,7 @@ type Config struct {
 type StorageConfig struct {
 	Host     string `yaml:"host" env:"DBHOST" env-default:"127.0.0.1" env-required:"true"`
 	Port     string `yaml:"port" env:"DBPORT" env-default:"5432" env-required:"true"`
-	Database string `yaml:"database" env:"DBNAME" env-default:"ctr env-required:"true""`
+	Database string `yaml:"database" env:"DBNAME" env-default:"ctr_showcase env-required:"true""`
 	Username string `yaml:"username" env:"DBUSER" env-default:"postgres" env-required:"true"`
 	Password string `yaml:"password" env:"DBPASS" env-default:"" env-required:"true"`
 }
