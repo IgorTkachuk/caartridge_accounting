@@ -11,8 +11,12 @@ import (
 	cartridge_model "github.com/IgorTkachuk/cartridge_accounting/internal/domain/cartridge_model/db"
 	"github.com/IgorTkachuk/cartridge_accounting/internal/domain/cartridge_status_type"
 	cartridge_status_type2 "github.com/IgorTkachuk/cartridge_accounting/internal/domain/cartridge_status_type/db"
+	ctr_showcase2 "github.com/IgorTkachuk/cartridge_accounting/internal/domain/ctr_showcase"
+	ctr_showcase "github.com/IgorTkachuk/cartridge_accounting/internal/domain/ctr_showcase/db"
 	decom_cause2 "github.com/IgorTkachuk/cartridge_accounting/internal/domain/decom_cause"
 	decom_cause "github.com/IgorTkachuk/cartridge_accounting/internal/domain/decom_cause/db"
+	doc2 "github.com/IgorTkachuk/cartridge_accounting/internal/domain/doc"
+	doc "github.com/IgorTkachuk/cartridge_accounting/internal/domain/doc/db"
 	doc_type2 "github.com/IgorTkachuk/cartridge_accounting/internal/domain/doc_type"
 	doc_type "github.com/IgorTkachuk/cartridge_accounting/internal/domain/doc_type/db"
 	employee2 "github.com/IgorTkachuk/cartridge_accounting/internal/domain/employee"
@@ -28,8 +32,10 @@ import (
 	"github.com/IgorTkachuk/cartridge_accounting/internal/handlers/auth"
 	"github.com/IgorTkachuk/cartridge_accounting/internal/handlers/bisiness_line"
 	cartridge_model2 "github.com/IgorTkachuk/cartridge_accounting/internal/handlers/cartridge_model"
+	ctr_showcase3 "github.com/IgorTkachuk/cartridge_accounting/internal/handlers/ctr_showcase"
 	"github.com/IgorTkachuk/cartridge_accounting/internal/handlers/ctr_status_type"
 	decom_cause3 "github.com/IgorTkachuk/cartridge_accounting/internal/handlers/decom_cause"
+	doc3 "github.com/IgorTkachuk/cartridge_accounting/internal/handlers/doc"
 	doc_type3 "github.com/IgorTkachuk/cartridge_accounting/internal/handlers/doc_type"
 	employee3 "github.com/IgorTkachuk/cartridge_accounting/internal/handlers/employee"
 	ou3 "github.com/IgorTkachuk/cartridge_accounting/internal/handlers/ou"
@@ -53,7 +59,7 @@ import (
 func main() {
 	logger := logging.GetLogger()
 	cfg := config.GetConfig()
-	//cfg := db.NewPgConfig("postgres", "mg0208", "localhost", "5432", "ctr")
+	//cfg := db.NewPgConfig("postgres", "mg0208", "localhost", "5432", "ctr_showcase")
 	cli, _ := postgresql.NewClient(context.Background(), 3, 5*time.Second, cfg.Storage)
 	r := user.NewRepository(cli, logger)
 	svc := user2.NewService(r, logger)
@@ -125,6 +131,18 @@ func main() {
 		CartridgeStatusTypeSvc: ctrStatusTypeSvc,
 	}
 
+	docRepo := doc.NewRepository(cli, logger)
+	docSvc := doc2.NewService(docRepo, logger)
+	docHandler := doc3.Handler{
+		DocSvc: docSvc,
+	}
+
+	ctrShowcaseRepo := ctr_showcase.NewRepository(cli, logger)
+	ctrShowcaseSvc := ctr_showcase2.NewService(ctrShowcaseRepo, logger)
+	ctrShowcaseHandler := ctr_showcase3.Handler{
+		CtrShowcaseSvc: ctrShowcaseSvc,
+	}
+
 	logger.Info("create approuter")
 	approuter := httprouter.New()
 
@@ -160,6 +178,12 @@ func main() {
 
 	logger.Info("Register cartridge status type handler")
 	ctrStatusTypeHandler.Register(approuter)
+
+	logger.Info("Register doc handler")
+	docHandler.Register(approuter)
+
+	logger.Info("Register doc handler")
+	ctrShowcaseHandler.Register(approuter)
 
 	logger.Info("apply CORS settings")
 	corsSettings := http2.CorsSettings()
